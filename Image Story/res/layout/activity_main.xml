@@ -18,6 +18,15 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="35dp"
-        android:text="@string/recAudio" />
+        android:text="@string/startRecAudio" />
+
+    <Button
+        android:id="@+id/play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/audio"
+        android:layout_below="@+id/audio"
+        android:layout_marginTop="38dp"
+        android:text="@string/playAudio" />
 
 </RelativeLayout>
