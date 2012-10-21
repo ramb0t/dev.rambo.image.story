@@ -7,5 +7,7 @@
     <string name="startRecAudio">Record</string>
     <string name="stopRecAudio">Stop</string>
     <string name="playAudio">Play</string>
+    <string name="nextButton">Next</string>
+    <string name="prevButton">Prev</string>
 
 </resources>

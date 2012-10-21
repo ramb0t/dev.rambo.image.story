@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -24,8 +25,12 @@ public class MainActivity extends Activity {
 	
 	public MediaRecorder mrec = null;
 	MediaPlayer mPlayer = new MediaPlayer();
+	
+	// button defines
 	private Button audio_Button = null;
 	private Button play_Button = null;
+	private Button next_Button = null;
+	private Button prev_Button = null;
 	
 	
     private static final String AUDIO_RECORDER_FILE_EXT_3GP = ".3gp";
@@ -33,14 +38,16 @@ public class MainActivity extends Activity {
 	private static final String AUDIO_RECORDER_FOLDER = "AudioRecorder";
 	
     private int currentFormat = 0;
+    
 
-    AudioImg ai = new AudioImg(); 
-	
+    AudioImg[] items = new AudioImg[10]; // default 10 items
+	private int item_count = 0;
+    
 	private int output_formats[] = { MediaRecorder.OutputFormat.MPEG_4, MediaRecorder.OutputFormat.THREE_GPP };
     private String file_exts[] = { AUDIO_RECORDER_FILE_EXT_MP4, AUDIO_RECORDER_FILE_EXT_3GP };
     
     
-	private static final String TAG = "SoundRecordingDemo";
+	private static final String TAG = "ImgStoryApp";
 	
 	// flag for button states
 	boolean recFlag = false;
@@ -50,13 +57,28 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+       // View mview = findViewById(R.layout.activity_main);
+
+       // mview.setBackgroundColor(Color.BLACK);
+
          
-        
+        // find the buttons
         audio_Button = (Button)findViewById(R.id.audio);
         play_Button = (Button)findViewById(R.id.play);
-     
+        next_Button = (Button)findViewById(R.id.next);
+        prev_Button = (Button)findViewById(R.id.prev);
         
+        // inital setup
+        prev_Button.setEnabled(false); //cant go back yet
+        play_Button.setEnabled(false); // nothing to play back yet
+        
+        play_Button.setText("Play " + item_count);
+        
+        items[item_count] = new AudioImg();
+        
+        
+     
+        // onclick for record button
         audio_Button.setOnClickListener(new View.OnClickListener(){
           public void onClick(View v) {
         	  if (!recFlag){ // start recording
@@ -77,6 +99,8 @@ public class MainActivity extends Activity {
                   
         		  recFlag = false;
         		  audio_Button.setText(R.string.startRecAudio);
+        		  
+        		  play_Button.setEnabled(true);
         	  }
           }
         });
@@ -86,13 +110,63 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
             	try {
             		mPlayer.reset();
-            		mPlayer.setDataSource(ai.getAudio().getAbsolutePath());
+            		mPlayer.setDataSource(items[item_count].getAudio().getAbsolutePath());
             		mPlayer.prepare();
             		mPlayer.start();
             	} catch (Exception e) {
             		Log.e(TAG, "Error playing back audio.");
             	}
       
+            }
+          });
+        
+        
+        // Next button onclick
+        next_Button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+            	if (item_count < 9){
+            		
+            		
+            		item_count++;
+            		if (items[item_count] == null){
+            			items[item_count] = new AudioImg();
+            			play_Button.setEnabled(false);
+            		} else if(items[item_count].getAudio() != null){
+            			play_Button.setEnabled(true);
+            		} else {
+            			play_Button.setEnabled(false);
+            		}
+            		
+            		play_Button.setText("Play " + item_count);
+            		
+            		prev_Button.setEnabled(true);
+            		
+            	} else{
+            		next_Button.setEnabled(false);
+            	}
+            }
+          });
+        
+        // prev button onclick
+        prev_Button.setOnClickListener(new View.OnClickListener(){      
+        	public void onClick(View v) {
+            	if (item_count > 0){
+            		item_count--;
+            		
+            		if (items[item_count].getAudio() == null){
+            			play_Button.setEnabled(false);
+            		} else{
+            			play_Button.setEnabled(true);
+            		}
+            		
+            		play_Button.setText("Play " + item_count);
+            		
+            		next_Button.setEnabled(true);
+            	} else{
+            		prev_Button.setEnabled(false);
+            	}
+            		
+        	      
             }
           });
         
@@ -110,7 +184,7 @@ public class MainActivity extends Activity {
         mrec.setOutputFile(file);
          
         File f = new File(file);
-        ai.setAudio(f); // store in object
+        items[item_count].setAudio(f); // store in object
         
 
         
@@ -145,6 +219,37 @@ public class MainActivity extends Activity {
        
         return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + file_exts[currentFormat]);
 }
+    
+    @Override
+    protected void onDestroy() {
+    	super.onDestroy();  // Always call the superclass method first
+        
+        String filepath = Environment.getExternalStorageDirectory().getPath();
+        File file = new File(filepath,AUDIO_RECORDER_FOLDER);
+        deleteDir(file);
+
+
+    }
+    
+    //Deleting the temperary folder and the file created in the sdcard
+    public static boolean deleteDir(File dir) 
+    {
+        if (dir.isDirectory()) 
+        {
+            String[] children = dir.list();
+            for (int i=0; i<children.length; i++) 
+            {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) 
+                {
+                    return false;
+                }
+            }
+        }
+        // The directory is now empty so delete it
+        return dir.delete();
+    }
+
 
     
 }
