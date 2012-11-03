@@ -7,9 +7,6 @@
 package dev.rambo.image.story;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import android.graphics.Bitmap;
@@ -17,8 +14,12 @@ import android.graphics.BitmapFactory;
 
 public class AudioImg implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private File audio;
-	private Bitmap img;
 	
 	private String bitmapPath;
     transient Bitmap bitmap;
@@ -36,15 +37,10 @@ public class AudioImg implements Serializable {
 	 * fetches the image file
 	 */
 	public Bitmap fetchImg(){
+
+		
 		Bitmap bitm = BitmapFactory.decodeFile(bitmapPath);
 		return bitm;
-	}
-	
-	public Bitmap getImg() {
-		return img;
-	}
-	public void setImg(Bitmap image) {
-		this.img = image;
 	}
 	
 	public File getAudio() {

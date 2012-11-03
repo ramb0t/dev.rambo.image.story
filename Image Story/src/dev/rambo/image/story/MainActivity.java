@@ -15,7 +15,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
-import android.graphics.Region;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
@@ -28,6 +27,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	
@@ -69,8 +69,6 @@ public class MainActivity extends Activity {
 	private int output_formats[] = { MediaRecorder.OutputFormat.MPEG_4, MediaRecorder.OutputFormat.THREE_GPP };
     private String file_exts[] = { AUDIO_RECORDER_FILE_EXT_MP4, AUDIO_RECORDER_FILE_EXT_3GP };
     
-    // image stuff
-    private Bitmap image;
     
     
 	private static final String TAG = "ImgStoryApp";
@@ -92,6 +90,9 @@ public class MainActivity extends Activity {
 	        for (int c=0; c < count; c++)
 	            items[c] = (AudioImg) objectInStream.readObject();
 	        objectInStream.close();
+	        
+	        Toast toast = Toast.makeText(getApplicationContext(), "Save Restored!", Toast.LENGTH_SHORT);
+	        toast.show();
         } catch (Exception ex){
         	Log.e(TAG, "save open error :(");
         	Log.e(TAG, ex.toString());
@@ -125,14 +126,19 @@ public class MainActivity extends Activity {
         
         // inital setup
         prev_Button.setEnabled(false); //cant go back yet
-        play_Button.setEnabled(false); // nothing to play back yet
+        
+        if(items[item_count].getAudio() == null){
+        	play_Button.setEnabled(false); // nothing to play back yet
+        }
         
         
         play_Button.setText("Play " + item_count);
         
-        items[item_count] = new AudioImg();
+        if (items[item_count] == null){
+        	items[item_count] = new AudioImg();
+        }
         
-        
+        updateThumbs();
      
         // onclick for record button
         audio_Button.setOnClickListener(new View.OnClickListener(){
@@ -140,6 +146,12 @@ public class MainActivity extends Activity {
         	  if (!recFlag){ // start recording
 		           try
 		           {
+		        	   // delete the old file first if it exists?
+		        	   File audio = items[item_count].getAudio();
+		        	   if(audio != null){
+		        		   audio.delete();
+		        	   }
+		        	   
 		        	   
 		        	   startRecording();
 		        	   
@@ -239,7 +251,7 @@ public class MainActivity extends Activity {
         // delete button onclick
         delete_Button.setOnClickListener(new View.OnClickListener(){      
         	public void onClick(View v) {
-            	items[item_count].setImg(null);
+            	items[item_count].setBitmapPath(null);
             	mainImage.setImageResource(R.drawable.no_pic);
             		
         	      
@@ -393,13 +405,14 @@ public class MainActivity extends Activity {
     
     
     private String getFilename(){ // generates the filename/path
-        String filepath = Environment.getExternalStorageDirectory().getPath();
+    	String filepath = Environment.getExternalStorageDirectory().getPath();
         File file = new File(filepath,AUDIO_RECORDER_FOLDER);
        
         if(!file.exists()){
                 file.mkdirs();
         }
        
+        // save the audio file as the current timestamp
         return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + file_exts[currentFormat]);
 }
     
@@ -407,9 +420,10 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
     	super.onDestroy();  // Always call the superclass method first
         
-        String filepath = Environment.getExternalStorageDirectory().getPath();
-        File file = new File(filepath,AUDIO_RECORDER_FOLDER);
-        deleteDir(file);
+    	// not using anymore
+        //String filepath = Environment.getExternalStorageDirectory().getPath();
+        //File file = new File(filepath,AUDIO_RECORDER_FOLDER);
+        //deleteDir(file);
 
 
     }
@@ -495,24 +509,30 @@ public class MainActivity extends Activity {
     }
     
     /**
+     * Save the image to a file
+     * Save the path to the object
      * Update the imageView with new bitmap
      * @param newImage
      */
     private void updateImageView(Bitmap newImage) {
     	
+    	String path = getFilesDir().toString() + "/" + item_count + ".png";
     	
-    	this.image = newImage;
     	FileOutputStream out;
 		try {
-			out = openFileOutput(item_count + ".png", Context.MODE_PRIVATE);
-		
-    	newImage.compress(CompressFormat.PNG, 100, out);
+			
+			out = new FileOutputStream(path);
+			newImage.compress(CompressFormat.PNG, 100, out);
+			out.close();
+			
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			Log.e(TAG, "Something went wrong taking the pic and saving it... ");
+			e.printStackTrace();
+		} catch (IOException e) {
+			Log.e(TAG, "Something went wrong closing the pic file output");
 			e.printStackTrace();
 		}
-		items[item_count].setBitmapPath(item_count + ".png");
-    	items[item_count].setImg(image); // store in the object
+		items[item_count].setBitmapPath(path); // store the path to the new image
     	this.mainImage.setImageBitmap(items[item_count].fetchImg()); // update the view
     }
 
