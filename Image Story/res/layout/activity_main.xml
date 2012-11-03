@@ -1,27 +1,9 @@
-<RelativeLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/laidout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/hello_world"
-        tools:context=".MainActivity" />
-
-    <Button
-        android:id="@+id/audio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="106dp"
-        android:text="@string/startRecAudio" />
+    android:layout_height="match_parent"
+    android:background="#000000" >
 
     <Button
         android:id="@+id/play"
@@ -29,24 +11,130 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="92dp"
         android:text="@string/playAudio" />
 
     <Button
-        android:id="@+id/next"
+        android:id="@+id/audio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:text="@string/nextButton" />
+        android:layout_above="@+id/play"
+        android:layout_centerHorizontal="true"
+        android:text="@string/startRecAudio" />
 
     <Button
         android:id="@+id/prev"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/next"
-        android:layout_alignBottom="@+id/next"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:text="@string/prevButton" />
+
+    <Button
+        android:id="@+id/next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="@string/nextButton" />
+    
+    <Button
+        android:id="@+id/save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/leftImg4"
+        android:text="Save" />
+    
+
+    <ImageView
+        android:id="@+id/mainImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/audio"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/no_pic" />
+
+    <ImageView
+        android:id="@+id/rightImg1"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_above="@+id/mainImage"
+        android:layout_toRightOf="@+id/mainImage"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/no_pic" />
+
+    <ImageView
+        android:id="@+id/leftImg1"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_above="@+id/mainImage"
+        android:layout_toLeftOf="@+id/mainImage"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/no_pic" />
+
+    <ImageView
+        android:id="@+id/rightImg2"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_above="@+id/rightImg1"
+        android:layout_alignParentRight="true"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/no_pic" />
+
+    <ImageView
+        android:id="@+id/leftImg2"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_above="@+id/leftImg1"
+        android:layout_alignParentLeft="true"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/no_pic" />
+
+    <ImageView
+        android:id="@+id/leftImg3"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_above="@+id/leftImg2"
+        android:layout_alignParentLeft="true"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/no_pic" />
+
+    <ImageView
+        android:id="@+id/rightImg3"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_above="@+id/rightImg2"
+        android:layout_alignParentRight="true"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/no_pic" />
+
+    <ImageView
+        android:id="@+id/rightImg4"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_above="@+id/rightImg3"
+        android:layout_toLeftOf="@+id/rightImg3"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/no_pic" />
+    
+    <ImageView
+        android:id="@+id/leftImg4"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_above="@+id/leftImg3"
+        android:layout_toRightOf="@+id/leftImg3"
+        android:contentDescription="@string/desc"
+        android:src="@drawable/no_pic" />
+
+    <Button
+        android:id="@+id/delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/audio"
+        android:text="@string/delete" />
+
 
 </RelativeLayout>

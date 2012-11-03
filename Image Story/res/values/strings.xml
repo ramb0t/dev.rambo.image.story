@@ -2,6 +2,7 @@
 
     <string name="app_name">Image Story</string>
     <string name="hello_world">Hello Image Story Person thing! :D</string>
+    <string name="desc">This is an ImageView.. </string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="startRecAudio">Record</string>
@@ -9,5 +10,6 @@
     <string name="playAudio">Play</string>
     <string name="nextButton">Next</string>
     <string name="prevButton">Prev</string>
+    <string name="delete">Delete</string>
 
 </resources>
