@@ -11,5 +11,6 @@
     <string name="nextButton">Next</string>
     <string name="prevButton">Prev</string>
     <string name="delete">Delete</string>
+    <string name="newSlide">New+</string>
 
 </resources>

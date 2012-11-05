@@ -38,6 +38,7 @@ public class MainActivity extends Activity {
 	// button defines
 	private Button audio_Button = null;
 	private Button play_Button = null;
+	private Button new_Button = null; 
 	private Button next_Button = null;
 	private Button prev_Button = null;
 	private Button delete_Button = null;
@@ -58,12 +59,13 @@ public class MainActivity extends Activity {
 	private static final int IMAGE_PICK 	= 1;
 	private static final int IMAGE_CAPTURE 	= 2;
 	
-	private static final int ITEM_SIZE = 10; // number of item objects that can be created 
+	private static int ITEM_SIZE = 1; // current size pointer
+	private static final int MAX_ITEM_SIZE = 20; // number of item objects that can be created 
 	
     private int currentFormat = 0;
     
 
-    AudioImg[] items = new AudioImg[ITEM_SIZE]; // default 10 items
+    AudioImg[] items = new AudioImg[MAX_ITEM_SIZE]; // default 10 items
 	private int item_count = 0;
     
 	private int output_formats[] = { MediaRecorder.OutputFormat.MPEG_4, MediaRecorder.OutputFormat.THREE_GPP };
@@ -87,9 +89,13 @@ public class MainActivity extends Activity {
 	        FileInputStream inStream = openFileInput("save_file.dat");
 	        ObjectInputStream objectInStream = new ObjectInputStream(inStream);
 	        int count = objectInStream.readInt(); // Get the number of objects
+	        
 	        for (int c=0; c < count; c++)
 	            items[c] = (AudioImg) objectInStream.readObject();
 	        objectInStream.close();
+	        
+	        // check the size of the imported array
+	        ITEM_SIZE = count;
 	        
 	        Toast toast = Toast.makeText(getApplicationContext(), "Save Restored!", Toast.LENGTH_SHORT);
 	        toast.show();
@@ -99,6 +105,7 @@ public class MainActivity extends Activity {
         	for (String s : fileList()){
         		Log.e(TAG, s);
         	}
+        	items[item_count] = new AudioImg();
         }
         
 
@@ -110,6 +117,7 @@ public class MainActivity extends Activity {
         prev_Button = (Button)findViewById(R.id.prev);
         delete_Button = (Button)findViewById(R.id.delete);
         save_Button = (Button)findViewById(R.id.save);
+        new_Button = (Button)findViewById(R.id.newSlide);
         
         // find imageviews
         mainImage = (ImageView)findViewById(R.id.mainImage);
@@ -188,18 +196,24 @@ public class MainActivity extends Activity {
             }
           });
         
+        // New button onclick
+        new_Button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+            	InsertNewSlide();
+            }
+          });
         
         // Next button onclick
         next_Button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
+         
+                // if not at the end of the array
             	if (item_count < ITEM_SIZE-1){
             		
             		
             		item_count++;
-            		if (items[item_count] == null){
-            			items[item_count] = new AudioImg();
-            			play_Button.setEnabled(false);
-            		} else if(items[item_count].getAudio() != null){
+            		
+            		if(items[item_count].getAudio() != null){
             			play_Button.setEnabled(true);
             		} else {
             			play_Button.setEnabled(false);
@@ -214,9 +228,7 @@ public class MainActivity extends Activity {
             		
             			
             		
-            	} else{
-            		next_Button.setEnabled(false);
-            	}
+            	} 
             }
           });
         
@@ -234,14 +246,11 @@ public class MainActivity extends Activity {
             		
             		play_Button.setText("Play " + item_count);
             		
-            		next_Button.setEnabled(true);
             		
             		// update the image thumbnails :D
             		updateThumbs();
             		
             		
-            	} else{
-            		prev_Button.setEnabled(false);
             	}
             		
         	      
@@ -251,10 +260,7 @@ public class MainActivity extends Activity {
         // delete button onclick
         delete_Button.setOnClickListener(new View.OnClickListener(){      
         	public void onClick(View v) {
-            	items[item_count].setBitmapPath(null);
-            	mainImage.setImageResource(R.drawable.no_pic);
-            		
-        	      
+            	DeleteImage();       	      
             }
           });
         
@@ -360,6 +366,22 @@ public class MainActivity extends Activity {
 	    		}
 	    	}
 	    	
+	    	
+	    	// Deal with button logic
+	    	if(item_count < ITEM_SIZE-1){
+		    	next_Button.setEnabled(true);
+	    	} else{
+	    		next_Button.setEnabled(false);
+	    	}
+	    	
+	    	if(item_count > 0){
+	    		prev_Button.setEnabled(true);
+	    	} else{
+	    		prev_Button.setEnabled(false);
+	    	}
+	    	
+	    	
+	    	
 			
     	} catch(Exception ex){
     		// just to catch any index errors?
@@ -399,6 +421,52 @@ public class MainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
+    }
+    
+    
+    
+    /**
+     * want to insert a new slide
+     * creates a new array, 1 item bigger than the last
+     * and stick a new object in the current position
+     */
+    public void InsertNewSlide(){
+    	if (ITEM_SIZE < MAX_ITEM_SIZE){ // only make bigger if space available
+	    	
+	    	AudioImg[] newItems = new AudioImg[++ITEM_SIZE]; // new array one position bigger
+	    	
+	    	// move left half of array
+	    	for(int i = 0; i <= item_count; i++){
+	    		newItems[i] = items[i];
+	    	}
+	    	
+	    	// create new object
+	    	newItems[item_count+1] = new AudioImg();
+	    	
+	    	// move right half of array
+	    	if(item_count+1 < ITEM_SIZE-1){
+		    	for(int i = item_count+1; i < ITEM_SIZE-1 ; i++){
+		    		newItems[i+1] = items[i];
+		    	}
+	    	}
+	    	
+	    	items = newItems; // replace the old array
+	    	updateThumbs(); // screen update
+	    	
+    	}
+    }
+    
+    /**
+     * deletes the current image 
+     */
+    public void DeleteImage(){
+    	File imageFile = new File(items[item_count].getBitmapPath());
+    	imageFile.delete();
+    	
+    	items[item_count].setBitmapPath(null);
+    	
+    	updateThumbs();
+    	
     }
     
     
