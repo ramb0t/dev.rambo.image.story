@@ -42,7 +42,10 @@ public class MainActivity extends Activity {
 	private Button next_Button = null;
 	private Button prev_Button = null;
 	private Button delete_Button = null;
-	private Button save_Button = null; 
+	private Button save_Button = null;
+	
+	private Button shiftL_Button = null; 
+	private Button shiftR_Button = null; 
 	
 	// image view defines
 	private ImageView mainImage = null;
@@ -118,6 +121,8 @@ public class MainActivity extends Activity {
         delete_Button = (Button)findViewById(R.id.delete);
         save_Button = (Button)findViewById(R.id.save);
         new_Button = (Button)findViewById(R.id.newSlide);
+        shiftR_Button = (Button)findViewById(R.id.shiftRight);
+        shiftL_Button = (Button)findViewById(R.id.shiftLeft);
         
         // find imageviews
         mainImage = (ImageView)findViewById(R.id.mainImage);
@@ -155,10 +160,7 @@ public class MainActivity extends Activity {
 		           try
 		           {
 		        	   // delete the old file first if it exists?
-		        	   File audio = items[item_count].getAudio();
-		        	   if(audio != null){
-		        		   audio.delete();
-		        	   }
+		        	   DeleteAudio();
 		        	   
 		        	   
 		        	   startRecording();
@@ -287,6 +289,22 @@ public class MainActivity extends Activity {
 				
 			}
 		});
+        
+        // shift right button onclick
+        shiftR_Button.setOnClickListener(new View.OnClickListener(){      
+        	public void onClick(View v) {
+            	ShiftItemRight();       	      
+            }
+        });
+        
+        // shift left button onclick
+        shiftL_Button.setOnClickListener(new View.OnClickListener(){      
+        	public void onClick(View v) {
+            	ShiftItemLeft();       	      
+            }
+        });
+        
+        
         
         // imageview onclick:
         mainImage.setOnClickListener(new TakePictureListener());
@@ -457,19 +475,64 @@ public class MainActivity extends Activity {
     }
     
     /**
+     * swaps two objects if possible
+     */
+    public void ShiftItemRight(){
+    	if (item_count < ITEM_SIZE){ // not at the end..
+    		AudioImg temp = items[item_count+1]; // swap
+    		items[item_count+1] = items[item_count];
+    		items[item_count] = temp;
+    		
+    		item_count++; // move right
+    		
+    		updateThumbs();
+    	} 
+    }
+    
+    public void ShiftItemLeft(){
+    	if (item_count > 0){ // not at the end..
+    		AudioImg temp = items[item_count-1]; // swap
+    		items[item_count-1] = items[item_count];
+    		items[item_count] = temp;
+    		
+    		item_count--; // move left
+    		
+    		updateThumbs();
+    	} 
+    	
+    }
+    
+    /**
      * deletes the current image 
      */
     public void DeleteImage(){
-    	File imageFile = new File(items[item_count].getBitmapPath());
-    	imageFile.delete();
-    	
-    	items[item_count].setBitmapPath(null);
+    	if(items[item_count].getBitmapPath() != null){
+	    	try{
+		    	File imageFile = new File(items[item_count].getBitmapPath());
+		    	if(imageFile != null){
+		    		imageFile.delete();
+		    	}
+	    	} catch(Exception ex){
+	    		Log.e(TAG, "Something horrible has gone wrong with the delete image function!!!");
+	    		Log.e(TAG, ex.toString());
+	    	}
+	    	items[item_count].setBitmapPath(null);
+	    }
     	
     	updateThumbs();
     	
     }
     
-    
+    /**
+     * deletes the current audio file
+     */
+    public void DeleteAudio(){
+       File audioFile = items[item_count].getAudio();
+ 	   if(audioFile != null){
+ 		   audioFile.delete();
+ 	   }
+    	
+    }
     
     
     private String getFilename(){ // generates the filename/path

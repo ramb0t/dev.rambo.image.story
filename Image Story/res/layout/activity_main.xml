@@ -144,4 +144,20 @@
         android:layout_alignParentRight="true"
         android:text="@string/newSlide" />
 
+    <Button
+        android:id="@+id/shiftRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/rightImg2"
+        android:layout_toLeftOf="@+id/rightImg1"
+        android:text="Shift R" />
+
+    <Button
+        android:id="@+id/shiftLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/leftImg1"
+        android:layout_toRightOf="@+id/leftImg1"
+        android:text="Shift L" />
+
 </RelativeLayout>
