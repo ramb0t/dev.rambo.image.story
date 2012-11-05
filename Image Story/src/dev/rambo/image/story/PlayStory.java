@@ -116,9 +116,16 @@ public class PlayStory extends Activity {
 			
 			count++;
 	    	} else{ // exit?
-	    		mPlayer.release();
+	    		onDestroy();
 	    	}
     	
+    }
+    
+    @Override
+    protected void onDestroy() {
+    	super.onDestroy();  // Always call the superclass method first
+    	mPlayer.stop();
+    	mPlayer.release();
     }
 
     @Override

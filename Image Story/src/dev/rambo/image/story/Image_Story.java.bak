@@ -21,7 +21,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -38,13 +37,15 @@ public class Image_Story extends Activity {
 	
 	// button defines
 	private Button audio_Button = null;
+	private Button play_Button = null;
 	private Button new_Button = null; 
 	private Button next_Button = null;
 	private Button prev_Button = null;
 	private Button delete_Button = null;
 	private Button save_Button = null;
 	
-	private Button shift_Button = null;
+	private Button shiftL_Button = null; 
+	private Button shiftR_Button = null;
 	
 	private Button go_Button = null;
 	
@@ -60,22 +61,8 @@ public class Image_Story extends Activity {
     private static final String AUDIO_RECORDER_FILE_EXT_MP4 = ".mp4";
 	private static final String AUDIO_RECORDER_FOLDER = "AudioRecorder";
 	
-	// Image Picking ID's
 	private static final int IMAGE_PICK 	= 1;
 	private static final int IMAGE_CAPTURE 	= 2;
-	
-	// Deletion Confirmation ID's
-	private static final int ID_YES = 3;
-	private static final int ID_NO = 4;
-	
-	// Audio ID's
-	private static final int ID_RECORD = 5;
-	private static final int ID_DELETE = 6;
-	private static final int ID_PLAY = 7;
-	
-	// Shift Image ID's
-	private static final int ID_LEFT = 8;
-	private static final int ID_RIGHT = 9;
 	
 	private static int ITEM_SIZE = 1; // current size pointer
 	private static final int MAX_ITEM_SIZE = 20; // number of item objects that can be created 
@@ -127,205 +114,22 @@ public class Image_Story extends Activity {
         	items[item_count] = new AudioImg();
         }
         
-        // Deletion Popup Options
-    	ActionItem yesItem 	= new ActionItem(ID_YES, "Yes");
-    	ActionItem noItem 	= new ActionItem(ID_NO, "No");
-    	
-    	// Image picking popup options
-    	ActionItem cameraItem = new ActionItem(IMAGE_CAPTURE, "Camera"); // , getResources().getDrawable(R.drawable.camera
-    	ActionItem galleryItem = new ActionItem(IMAGE_PICK, "Gallery");
-    	
-    	// Audio popup options
-    	ActionItem recordItem = new ActionItem(ID_RECORD, "Record/Overwrite");
-    	ActionItem deleteItem = new ActionItem(ID_DELETE, "Delete");
-    	ActionItem playItem = new ActionItem(ID_PLAY, "Play Audio");
-    	
-    	// Shift popup options
-    	ActionItem leftItem = new ActionItem(ID_LEFT, "Left");
-    	ActionItem rightItem = new ActionItem(ID_RIGHT, "Right");
-    	
-    	
-    	// Deletion popup window
-    	final QuickAction delAction 	= new QuickAction(this);
-    	
-    	// Camera popup window
-    	final QuickAction picAction = new QuickAction(this);
-    	
-    	// Audio popup window
-    	final QuickAction audAction = new QuickAction(this);
-    	
-    	// Shift popup window
-    	final QuickAction sftAction = new QuickAction(this);
-    	
-    	
-    	// Add options to deletion popup window
-    	delAction.addActionItem(yesItem);
-    	delAction.addActionItem(noItem);
-    	
-    	// Add options to image pick popup window
-    	picAction.addActionItem(cameraItem);
-    	picAction.addActionItem(galleryItem);
-    	
-    	// Add options to audio popup window
-    	audAction.addActionItem(recordItem);
-    	audAction.addActionItem(deleteItem);
-    	audAction.addActionItem(playItem);
-    	
-    	// Add options to shift popup window
-    	sftAction.addActionItem(leftItem);
-    	sftAction.addActionItem(rightItem);
-    	
-    	
-    	// Set options to delete 
-    	delAction.setOnActionItemClickListener (new QuickAction.OnActionItemClickListener() {
-    		public void onItemClick(QuickAction quickAction, int pos, int actionId) {
-    			ActionItem actionItem = quickAction.getActionItem(pos);
-    			
-    			if (actionId == ID_YES) {
-    				DeleteImage();
-    				Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
-    			} else {
-    				Toast.makeText(getApplicationContext(), actionItem.getTitle() + "Not Deleted!", Toast.LENGTH_SHORT).show();
-    			}
-    		}
-    	});
-    	
-    	// Set options to image picker
-    	picAction.setOnActionItemClickListener (new QuickAction.OnActionItemClickListener () {
-    		public void onItemClick(QuickAction quickAction, int pos, int actionId) {
-    			ActionItem actionItem = quickAction.getActionItem(pos);
-    			
-    			if (actionId == IMAGE_CAPTURE) {
-    				Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-    				startActivityForResult(intent, IMAGE_CAPTURE);
-    			} else {
-    				Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-    				intent.setType("image/");
-    				startActivityForResult(Intent.createChooser(intent, "Pick photo"), IMAGE_PICK);
-    			}
-    		}
-    	});
-    	
-    	// Set options to audio
-    	audAction.setOnActionItemClickListener (new QuickAction.OnActionItemClickListener() {
-    		public void onItemClick(QuickAction quickAction, int pos, int actionId) {
-    			ActionItem actionItem = quickAction.getActionItem(pos);
-    			
-    			if (actionId == ID_RECORD) {
-    				if (!recFlag){ // start recording
-    			           try
-    			           {
-    			        	   // delete the old file first if it exists?
-    			        	   DeleteAudio();
-    			        	   
-    			        	   
-    			        	   startRecording();
-    			        	   
-    			        	   recFlag = true;
-    			        	   audio_Button.setText(R.string.stopRecAudio);
-    			           }catch (Exception ee)
-    			           {
-    			        	   Log.e(TAG,"Caught io exception " + ee.getMessage());
-    			           }
-    	        	  } else { // stop recording
-
-    	        		  stopRecording();
-    	                  
-    	        		  recFlag = false;
-    	        		  audio_Button.setText(R.string.startRecAudio);
-    	        		  
-    	        
-    	        	  }
-    				Toast.makeText(getApplicationContext(), " Audio Recorded!", Toast.LENGTH_SHORT).show();
-    			} else if (actionId == ID_DELETE) {
-    				DeleteAudio();
-    				Toast.makeText(getApplicationContext(), actionItem.getTitle() + "Audio Deleted!", Toast.LENGTH_SHORT).show();
-    			} else { // Play audio
-    				if(items[item_count].getAudio() != null){
-    					try {
-    						mPlayer.reset();
-    						mPlayer.setDataSource(items[item_count].getAudio().getAbsolutePath());
-    						mPlayer.prepare();
-    						mPlayer.start();
-    					} catch (Exception e) {
-    						Log.e(TAG, "Error playing back audio.");
-    					  }
-    				}
-    			}
-    		}
-    	});
-    	
-    	// Set options to shift
-    	sftAction.setOnActionItemClickListener (new QuickAction.OnActionItemClickListener() {
-    		public void onItemClick(QuickAction quickAction, int pos, int actionId) {
-    			ActionItem actionItem = quickAction.getActionItem(pos);
-    			
-    			if (actionId == ID_LEFT) {
-    				ShiftItemLeft();
-    			} else {
-    				ShiftItemRight();
-    			}
-    		}
-    	});
-    	
-    	
-    	// Link delete button
-    	delete_Button = (Button)findViewById(R.id.delete);
-    	
-    	// Link Image View to main picture
-        mainImage = (ImageView)findViewById(R.id.mainImage);
-        
-        // Link audio button
-        audio_Button = (Button)findViewById(R.id.audio);
-        
-        // Link shift button
-        shift_Button = (Button)findViewById(R.id.shiftRight);
-    	
-        
-    	// Delete button onClick
-        delete_Button.setOnClickListener(new View.OnClickListener(){      
-        	public void onClick(View v) {
-            	delAction.show(v);       	      
-            }
-          });
-        
-        // Image View onClick
-        mainImage.setOnClickListener(new View.OnClickListener(){
-        	public void onClick(View v) {
-        		picAction.show(v);
-        	}
-        });
-        
-        // Audio button onClick
-        audio_Button.setOnClickListener(new View.OnClickListener(){
-          public void onClick(View v) {
-        	  audAction.show(v);
-          }
-        });
-        
-        // Shift button onClick
-        shift_Button.setOnClickListener(new View.OnClickListener(){      
-        	public void onClick(View v) {
-            	sftAction.show(v);       	      
-            }
-          });
-        
-        
-        
-        
 
          
         // find the buttons
-        
+        audio_Button = (Button)findViewById(R.id.audio);
+        play_Button = (Button)findViewById(R.id.play);
         next_Button = (Button)findViewById(R.id.next);
         prev_Button = (Button)findViewById(R.id.prev);
-       
+        delete_Button = (Button)findViewById(R.id.delete);
         save_Button = (Button)findViewById(R.id.save);
         new_Button = (Button)findViewById(R.id.newSlide);
-        
+        shiftR_Button = (Button)findViewById(R.id.shiftRight);
+        shiftL_Button = (Button)findViewById(R.id.shiftLeft);
         go_Button = (Button)findViewById(R.id.playStory);
         
-        
+        // find imageviews
+        mainImage = (ImageView)findViewById(R.id.mainImage);
         
         rightThumbArr[0] = (ImageView)findViewById(R.id.rightImg1);
         rightThumbArr[1] = (ImageView)findViewById(R.id.rightImg2);
@@ -340,12 +144,63 @@ public class Image_Story extends Activity {
         // inital setup
         prev_Button.setEnabled(false); //cant go back yet
         
-
+        if(items[item_count].getAudio() == null){
+        	play_Button.setEnabled(false); // nothing to play back yet
+        }
+        
+        
+        play_Button.setText("Play " + item_count);
+        
         if (items[item_count] == null){
         	items[item_count] = new AudioImg();
         }
         
         updateThumbs();
+     
+        // onclick for record button
+        audio_Button.setOnClickListener(new View.OnClickListener(){
+          public void onClick(View v) {
+        	  if (!recFlag){ // start recording
+		           try
+		           {
+		        	   // delete the old file first if it exists?
+		        	   DeleteAudio();
+		        	   
+		        	   
+		        	   startRecording();
+		        	   
+		        	   recFlag = true;
+		        	   audio_Button.setText(R.string.stopRecAudio);
+		           }catch (Exception ee)
+		           {
+		        	   Log.e(TAG,"Caught io exception " + ee.getMessage());
+		           }
+        	  } else { // stop recording
+
+        		  stopRecording();
+                  
+        		  recFlag = false;
+        		  audio_Button.setText(R.string.startRecAudio);
+        		  
+        		  play_Button.setEnabled(true);
+        	  }
+          }
+        });
+        
+        //playback button
+        play_Button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+            	try {
+            		mPlayer.reset();
+            		mPlayer.setDataSource(items[item_count].getAudio().getAbsolutePath());
+            		mPlayer.prepare();
+            		mPlayer.start();
+            	} catch (Exception e) {
+            		Log.e(TAG, "Error playing back audio.");
+            	}
+      
+            }
+          });
         
         // New button onclick
         new_Button.setOnClickListener(new View.OnClickListener(){
@@ -363,7 +218,14 @@ public class Image_Story extends Activity {
             		
             		
             		item_count++;
-        
+            		
+            		if(items[item_count].getAudio() != null){
+            			play_Button.setEnabled(true);
+            		} else {
+            			play_Button.setEnabled(false);
+            		}
+            		
+            		play_Button.setText("Play " + item_count);
             		
             		prev_Button.setEnabled(true);
             		
@@ -382,7 +244,13 @@ public class Image_Story extends Activity {
             	if (item_count > 0){
             		item_count--;
             		
+            		if (items[item_count].getAudio() == null){
+            			play_Button.setEnabled(false);
+            		} else{
+            			play_Button.setEnabled(true);
+            		}
             		
+            		play_Button.setText("Play " + item_count);
             		
             		
             		// update the image thumbnails :D
@@ -395,25 +263,46 @@ public class Image_Story extends Activity {
             }
           });
         
+        // delete button onclick
+        delete_Button.setOnClickListener(new View.OnClickListener(){      
+        	public void onClick(View v) {
+            	DeleteImage();       	      
+            }
+          });
+        
         // save button onclick
         save_Button.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				saveStory();			
 				
-				Toast.makeText(getApplicationContext(), " Saved!", Toast.LENGTH_SHORT).show();
 			}
 		});
+        
+        // shift right button onclick
+        shiftR_Button.setOnClickListener(new View.OnClickListener(){      
+        	public void onClick(View v) {
+            	ShiftItemRight();       	      
+            }
+        });
+        
+        // shift left button onclick
+        shiftL_Button.setOnClickListener(new View.OnClickListener(){      
+        	public void onClick(View v) {
+            	ShiftItemLeft();       	      
+            }
+        });
         
         // go button onclick
         go_Button.setOnClickListener(new View.OnClickListener(){      
         	public void onClick(View v) {
-            	//playShow();    	      
+            	playShow();    	      
             }
         });
         
         
         
-        
+        // imageview onclick:
+        mainImage.setOnClickListener(new TakePictureListener());
         
         
        
@@ -735,8 +624,7 @@ public class Image_Story extends Activity {
     /**
      * Receive the result from the startActivity
      */
-    @Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	
     	if (resultCode == Activity.RESULT_OK) { 
 	    	switch (requestCode) {
@@ -768,7 +656,7 @@ public class Image_Story extends Activity {
      */
     private void imageFromGallery(int resultCode, Intent data) {
     	Uri selectedImage = data.getData();
-    	String [] filePathColumn = {MediaColumns.DATA};
+    	String [] filePathColumn = {MediaStore.Images.Media.DATA};
     	
     	Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
     	cursor.moveToFirst();
@@ -777,7 +665,7 @@ public class Image_Story extends Activity {
     	String filePath = cursor.getString(columnIndex);
     	cursor.close();
     	
-    	this.updateImageView(Bitmap.createScaledBitmap(BitmapFactory.decodeFile(filePath), 320, 240, false));
+    	this.updateImageView(BitmapFactory.decodeFile(filePath));
     }
     
     /**
