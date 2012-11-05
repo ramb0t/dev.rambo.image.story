@@ -273,23 +273,7 @@ public class Image_Story extends Activity {
         // save button onclick
         save_Button.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				String FILENAME = "save_file.dat";
-				try{
-					FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-					
-					
-					ObjectOutputStream objectOutStream = new ObjectOutputStream(fos);
-					objectOutStream.writeInt(items.length); // Save size first
-					for(AudioImg a :items)
-					    objectOutStream.writeObject(a);
-					objectOutStream.close();
-					fos.close();
-					Log.d(TAG, "File Saved!");
-					
-				} catch(Exception ex){
-					Log.e(TAG, "Save error... :(");
-				}
-				
+				saveStory();			
 				
 			}
 		});
@@ -419,6 +403,29 @@ public class Image_Story extends Activity {
     	
     }
     
+    /**
+     * saves the current story layout to a file
+     * @author Rambo
+     */
+    private void saveStory(){
+    	String FILENAME = "save_file.dat";
+		try{
+			FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+			
+			
+			ObjectOutputStream objectOutStream = new ObjectOutputStream(fos);
+			objectOutStream.writeInt(items.length); // Save size first
+			for(AudioImg a :items)
+			    objectOutStream.writeObject(a);
+			objectOutStream.close();
+			fos.close();
+			Log.d(TAG, "File Saved!");
+			
+		} catch(Exception ex){
+			Log.e(TAG, "Save error... :(");
+		}
+    }
+    
     protected void startRecording() throws IOException 
     {
 
@@ -426,6 +433,7 @@ public class Image_Story extends Activity {
     	mrec.setAudioSource(MediaRecorder.AudioSource.MIC);
         mrec.setOutputFormat(output_formats[currentFormat]);
         mrec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        
         String file = getFilename();
         mrec.setOutputFile(file);
          
@@ -518,7 +526,7 @@ public class Image_Story extends Activity {
      */
     public void playShow(){
     	Intent intent = new Intent(this, PlayStory.class);
-    	intent.putExtra(EXTRA_MESSAGE, items);
+    	saveStory();
     	startActivity(intent);
     	
     }
@@ -580,7 +588,7 @@ public class Image_Story extends Activity {
 
     }
     
-    //Deleting the temperary folder and the file created in the sdcard
+    //Deleting the temporary folder and the file created in the sdcard
     public static boolean deleteDir(File dir) 
     {
         if (dir.isDirectory()) 
