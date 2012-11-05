@@ -29,7 +29,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
+public class Image_Story extends Activity {
 	
 	
 	public MediaRecorder mrec = null;
@@ -45,7 +45,9 @@ public class MainActivity extends Activity {
 	private Button save_Button = null;
 	
 	private Button shiftL_Button = null; 
-	private Button shiftR_Button = null; 
+	private Button shiftR_Button = null;
+	
+	private Button go_Button = null;
 	
 	// image view defines
 	private ImageView mainImage = null;
@@ -77,6 +79,7 @@ public class MainActivity extends Activity {
     
     
 	private static final String TAG = "ImgStoryApp";
+	static final String EXTRA_MESSAGE = "dev.rambo.image.story.AudioImageArray";
 	
 	// flag for button states
 	boolean recFlag = false;
@@ -123,6 +126,7 @@ public class MainActivity extends Activity {
         new_Button = (Button)findViewById(R.id.newSlide);
         shiftR_Button = (Button)findViewById(R.id.shiftRight);
         shiftL_Button = (Button)findViewById(R.id.shiftLeft);
+        go_Button = (Button)findViewById(R.id.playStory);
         
         // find imageviews
         mainImage = (ImageView)findViewById(R.id.mainImage);
@@ -304,6 +308,13 @@ public class MainActivity extends Activity {
             }
         });
         
+        // go button onclick
+        go_Button.setOnClickListener(new View.OnClickListener(){      
+        	public void onClick(View v) {
+            	playShow();    	      
+            }
+        });
+        
         
         
         // imageview onclick:
@@ -478,7 +489,7 @@ public class MainActivity extends Activity {
      * swaps two objects if possible
      */
     public void ShiftItemRight(){
-    	if (item_count < ITEM_SIZE){ // not at the end..
+    	if (item_count < ITEM_SIZE-1){ // not at the end..
     		AudioImg temp = items[item_count+1]; // swap
     		items[item_count+1] = items[item_count];
     		items[item_count] = temp;
@@ -499,6 +510,16 @@ public class MainActivity extends Activity {
     		
     		updateThumbs();
     	} 
+    	
+    }
+    
+    /**
+     * creates a new activity that runs the show
+     */
+    public void playShow(){
+    	Intent intent = new Intent(this, PlayStory.class);
+    	intent.putExtra(EXTRA_MESSAGE, items);
+    	startActivity(intent);
     	
     }
     

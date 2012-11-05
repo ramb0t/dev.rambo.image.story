@@ -12,6 +12,6 @@
     <string name="prevButton">Prev</string>
     <string name="delete">Delete</string>
     <string name="newSlide">New+</string>
-    
+    <string name="title_activity_play_story">PlayStory</string>
 
 </resources>
