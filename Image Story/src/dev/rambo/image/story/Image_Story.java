@@ -20,13 +20,13 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -37,16 +37,16 @@ public class Image_Story extends Activity {
 	MediaPlayer mPlayer = new MediaPlayer();
 	
 	// button defines
-	private Button audio_Button = null;
-	private Button new_Button = null; 
-	private Button next_Button = null;
-	private Button prev_Button = null;
-	private Button delete_Button = null;
-	private Button save_Button = null;
+	private ImageButton audio_Button = null;
+	private ImageButton new_Button = null; 
+	private ImageButton next_Button = null;
+	private ImageButton prev_Button = null;
+	private ImageButton delete_Button = null;
+	private ImageButton save_Button = null;
 	
-	private Button shift_Button = null;
+	private ImageButton shift_Button = null;
 	
-	private Button go_Button = null;
+	private ImageButton go_Button = null;
 	
 	// image view defines
 	private ImageView mainImage = null;
@@ -113,8 +113,7 @@ public class Image_Story extends Activity {
 	            items[c] = (AudioImg) objectInStream.readObject();
 	        objectInStream.close();
 	        
-	        // check the size of the imported array
-	        ITEM_SIZE = count;
+	        
 	        
 	        Toast toast = Toast.makeText(getApplicationContext(), "Save Restored!", Toast.LENGTH_SHORT);
 	        toast.show();
@@ -127,22 +126,26 @@ public class Image_Story extends Activity {
         	items[item_count] = new AudioImg();
         }
         
+        // check the size of the imported array
+        ITEM_SIZE = items.length;
+        
         // Deletion Popup Options
-    	ActionItem yesItem 	= new ActionItem(ID_YES, "Yes");
-    	ActionItem noItem 	= new ActionItem(ID_NO, "No");
+    	ActionItem yesItem 	= new ActionItem(ID_YES, getResources().getDrawable(R.drawable.ok_app));
+    	ActionItem noItem 	= new ActionItem(ID_NO, getResources().getDrawable(R.drawable.back_app));
     	
     	// Image picking popup options
-    	ActionItem cameraItem = new ActionItem(IMAGE_CAPTURE, "Camera"); // , getResources().getDrawable(R.drawable.camera
-    	ActionItem galleryItem = new ActionItem(IMAGE_PICK, "Gallery");
+    	ActionItem cameraItem = new ActionItem(IMAGE_CAPTURE, getResources().getDrawable(R.drawable.camera_app)); // , getResources().getDrawable(R.drawable.camera
+    	ActionItem galleryItem = new ActionItem(IMAGE_PICK, getResources().getDrawable(R.drawable.gallery_app));
     	
     	// Audio popup options
-    	ActionItem recordItem = new ActionItem(ID_RECORD, "Record/Overwrite");
-    	ActionItem deleteItem = new ActionItem(ID_DELETE, "Delete");
-    	ActionItem playItem = new ActionItem(ID_PLAY, "Play Audio");
+    	ActionItem recordItem = new ActionItem(ID_RECORD, getResources().getDrawable(R.drawable.record_stop_audio_app));
+    	recordItem.setSticky(true);
+    	ActionItem deleteItem = new ActionItem(ID_DELETE, getResources().getDrawable(R.drawable.delete_audio_app));
+    	ActionItem playItem = new ActionItem(ID_PLAY, getResources().getDrawable(R.drawable.play_audio_app));
     	
     	// Shift popup options
-    	ActionItem leftItem = new ActionItem(ID_LEFT, "Left");
-    	ActionItem rightItem = new ActionItem(ID_RIGHT, "Right");
+    	ActionItem leftItem = new ActionItem(ID_LEFT, getResources().getDrawable(R.drawable.left_app));
+    	ActionItem rightItem = new ActionItem(ID_RIGHT, getResources().getDrawable(R.drawable.right_app));
     	
     	
     	// Deletion popup window
@@ -220,9 +223,8 @@ public class Image_Story extends Activity {
     			        	   
     			        	   
     			        	   startRecording();
-    			        	   
+    			        	   Toast.makeText(getApplicationContext(), "Recording Audio...", Toast.LENGTH_SHORT).show();
     			        	   recFlag = true;
-    			        	   audio_Button.setText(R.string.stopRecAudio);
     			           }catch (Exception ee)
     			           {
     			        	   Log.e(TAG,"Caught io exception " + ee.getMessage());
@@ -232,8 +234,7 @@ public class Image_Story extends Activity {
     	        		  stopRecording();
     	                  
     	        		  recFlag = false;
-    	        		  audio_Button.setText(R.string.startRecAudio);
-    	        		  
+    	        		  Toast.makeText(getApplicationContext(), "Audio Recorded!", Toast.LENGTH_SHORT).show();
     	        
     	        	  }
     				Toast.makeText(getApplicationContext(), " Audio Recorded!", Toast.LENGTH_SHORT).show();
@@ -270,16 +271,16 @@ public class Image_Story extends Activity {
     	
     	
     	// Link delete button
-    	delete_Button = (Button)findViewById(R.id.delete);
+    	delete_Button = (ImageButton)findViewById(R.id.delete);
     	
     	// Link Image View to main picture
         mainImage = (ImageView)findViewById(R.id.mainImage);
         
         // Link audio button
-        audio_Button = (Button)findViewById(R.id.audio);
+        audio_Button = (ImageButton)findViewById(R.id.audio);
         
         // Link shift button
-        shift_Button = (Button)findViewById(R.id.shiftRight);
+        shift_Button = (ImageButton)findViewById(R.id.shiftRight);
     	
         
     	// Delete button onClick
@@ -316,14 +317,15 @@ public class Image_Story extends Activity {
 
          
         // find the buttons
+        try{
         
-        next_Button = (Button)findViewById(R.id.next);
-        prev_Button = (Button)findViewById(R.id.prev);
+        next_Button = (ImageButton)findViewById(R.id.next);
+        prev_Button = (ImageButton)findViewById(R.id.prev);
        
-        save_Button = (Button)findViewById(R.id.save);
-        new_Button = (Button)findViewById(R.id.newSlide);
+        save_Button = (ImageButton)findViewById(R.id.save);
+        new_Button = (ImageButton)findViewById(R.id.newSlide);
         
-        go_Button = (Button)findViewById(R.id.playStory);
+        go_Button = (ImageButton)findViewById(R.id.playStory);
         
         
         
@@ -335,6 +337,10 @@ public class Image_Story extends Activity {
         leftThumbArr[1] = (ImageView)findViewById(R.id.leftImg2);
         leftThumbArr[2] = (ImageView)findViewById(R.id.leftImg3);
         leftThumbArr[3] = (ImageView)findViewById(R.id.leftImg4);
+        } catch(Exception ex){
+        	Log.e(TAG, ":/");
+        }
+        
         
         
         // inital setup
@@ -361,16 +367,11 @@ public class Image_Story extends Activity {
                 // if not at the end of the array
             	if (item_count < ITEM_SIZE-1){
             		
-            		
             		item_count++;
         
-            		
-            		prev_Button.setEnabled(true);
-            		
             		// Update thumbnails 
             		updateThumbs();
-            		
-            			
+	
             		
             	} 
             }
@@ -381,14 +382,10 @@ public class Image_Story extends Activity {
         	public void onClick(View v) {
             	if (item_count > 0){
             		item_count--;
-            		
-            		
-            		
-            		
+
             		// update the image thumbnails :D
             		updateThumbs();
-            		
-            		
+
             	}
             		
         	      
@@ -407,7 +404,7 @@ public class Image_Story extends Activity {
         // go button onclick
         go_Button.setOnClickListener(new View.OnClickListener(){      
         	public void onClick(View v) {
-            	//playShow();    	      
+            	playShow();    	      
             }
         });
         
@@ -425,7 +422,7 @@ public class Image_Story extends Activity {
     private void updateThumbs(){
     	try{
 	    	// check if the main image exists
-	    	if(items[item_count].fetchImg() != null){
+	    	if(items[item_count].getBitmapPath() != null){
 				mainImage.setImageBitmap(items[item_count].fetchImg()); // update the view
 				
 			} else{

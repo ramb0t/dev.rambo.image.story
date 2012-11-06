@@ -5,52 +5,29 @@
     android:layout_height="match_parent"
     android:background="#000000" >
 
-    <Button
-        android:id="@+id/play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/playAudio" />
-
-    <Button
-        android:id="@+id/audio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/play"
-        android:layout_centerHorizontal="true"
-        android:text="@string/startRecAudio" />
-
-    <Button
+    <ImageButton
         android:id="@+id/prev"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:text="@string/prevButton" />
+        android:scaleType="fitXY"
+        android:src="@drawable/arrow_left" />
 
-    <Button
+    <ImageButton
         android:id="@+id/next"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:text="@string/nextButton" />
-    
-    <Button
-        android:id="@+id/save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/leftImg4"
-        android:text="Save" />
-    
+        android:scaleType="fitXY"
+        android:src="@drawable/arrow_right" />
 
     <ImageView
         android:id="@+id/mainImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/audio"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"
         android:contentDescription="@string/desc"
@@ -118,7 +95,7 @@
         android:layout_toLeftOf="@+id/rightImg3"
         android:contentDescription="@string/desc"
         android:src="@drawable/no_pic" />
-    
+
     <ImageView
         android:id="@+id/leftImg4"
         android:layout_width="24dp"
@@ -128,44 +105,58 @@
         android:contentDescription="@string/desc"
         android:src="@drawable/no_pic" />
 
-    <Button
-        android:id="@+id/delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/audio"
-        android:text="@string/delete" />
-
-    <Button
-        android:id="@+id/newSlide"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/audio"
-        android:layout_alignParentRight="true"
-        android:text="@string/newSlide" />
-
-    <Button
-        android:id="@+id/shiftRight"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/rightImg2"
-        android:layout_toLeftOf="@+id/rightImg1"
-        android:text="Shift R" />
-
-    <Button
-        android:id="@+id/shiftLeft"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/leftImg1"
-        android:layout_toRightOf="@+id/leftImg1"
-        android:text="Shift L" />
-
-    <Button
+    <ImageButton
         android:id="@+id/playStory"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/leftImg1"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/play_story" />
+
+    <ImageButton
+        android:id="@+id/save"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignLeft="@+id/playStory"
+        android:layout_below="@+id/playStory"
+        android:scaleType="fitXY"
+        android:src="@drawable/save_story" />
+
+    <ImageButton
+        android:id="@+id/delete"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignLeft="@+id/save"
+        android:layout_below="@+id/save"
+        android:scaleType="fitXY"
+        android:src="@drawable/photo_delete" />
+
+    <ImageButton
+        android:id="@+id/shiftRight"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignLeft="@+id/delete"
+        android:layout_below="@+id/delete"
+        android:scaleType="fitXY"
+        android:src="@drawable/photo_shift" />
+
+    <ImageButton
+        android:id="@+id/audio"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignLeft="@+id/shiftRight"
+        android:layout_below="@+id/shiftRight"
+        android:scaleType="fitXY"
+        android:src="@drawable/record_audio" />
+
+    <ImageButton
+        android:id="@+id/newSlide"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_alignLeft="@+id/audio"
-        android:text="Go!" />
+        android:layout_below="@+id/audio"
+        android:scaleType="fitXY"
+        android:src="@drawable/photo_new" />
 
 </RelativeLayout>
