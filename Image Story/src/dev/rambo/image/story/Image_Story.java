@@ -103,33 +103,148 @@ public class Image_Story extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-        // try recover save?
-        try{
-	        FileInputStream inStream = openFileInput("save_file.dat");
-	        ObjectInputStream objectInStream = new ObjectInputStream(inStream);
-	        int count = objectInStream.readInt(); // Get the number of objects
-	        
-	        for (int c=0; c < count; c++)
-	            items[c] = (AudioImg) objectInStream.readObject();
-	        objectInStream.close();
-	        
-	        
-	        
-	        Toast toast = Toast.makeText(getApplicationContext(), "Save Restored!", Toast.LENGTH_SHORT);
-	        toast.show();
-        } catch (Exception ex){
-        	Log.e(TAG, "save open error :(");
-        	Log.e(TAG, ex.toString());
-        	for (String s : fileList()){
-        		Log.e(TAG, s);
-        	}
-        	items[item_count] = new AudioImg();
+        // try to recover old save?
+        if (!getSave()){ // old save not found, init new story 
+        	newStory();
+        }else{
+            // prevent errors from dodgey saves.. 
+            if (items[item_count] == null){
+            	items[item_count] = new AudioImg();
+            }
+              
+            // check the size of the array before continuing
+            ITEM_SIZE = 0;
+            for(AudioImg a : items){
+            	if (a != null){
+            		ITEM_SIZE++;
+            	}
+            }
+        }
+        	
+        	
+
+        
+        
+        //sets up the popups for the buttons
+        popSetup();
+        
+                
+        // find the buttons and setup onclicks
+        buttonSetup();
+        
+        // refresh the screen
+        updateThumbs();
+        
+       
+    }
+    
+    
+    /**
+     * finds the buttons and sets up their onclicks
+     * @author Rambo
+     */
+    private void buttonSetup() {
+    	try{
+            
+            next_Button = (ImageButton)findViewById(R.id.next);
+            prev_Button = (ImageButton)findViewById(R.id.prev);
+           
+            save_Button = (ImageButton)findViewById(R.id.save);
+            new_Button = (ImageButton)findViewById(R.id.newSlide);
+            
+            go_Button = (ImageButton)findViewById(R.id.playStory);
+            
+     
+            // find imageviews
+            rightThumbArr[0] = (ImageView)findViewById(R.id.rightImg1);
+            rightThumbArr[1] = (ImageView)findViewById(R.id.rightImg2);
+            rightThumbArr[2] = (ImageView)findViewById(R.id.rightImg3);
+            rightThumbArr[3] = (ImageView)findViewById(R.id.rightImg4);
+            leftThumbArr[0] = (ImageView)findViewById(R.id.leftImg1);
+            leftThumbArr[1] = (ImageView)findViewById(R.id.leftImg2);
+            leftThumbArr[2] = (ImageView)findViewById(R.id.leftImg3);
+            leftThumbArr[3] = (ImageView)findViewById(R.id.leftImg4);
+            } catch(Exception ex){ // report errors
+            	Log.e(TAG, ":/ something went wrong finding the buttons, check your XML!");
+            }
+     
+		
+        // New button onclick
+        // creates a new slide to the right of the current one if possible
+        new_Button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+            	InsertNewSlide();
+            }
+          });
+        
+        // Next button onclick
+        // moves slides foward one position
+        next_Button.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                // if not at the end of the array
+            	if (item_count < ITEM_SIZE-1){
+            		
+            		item_count++; // move pointer foward one and
+        
+            		// Update thumbnails 
+            		updateThumbs();
+	
+            		
+            	} 
+            }
+          });
+        
+        // prev button onclick
+        // moves slides back one position
+        prev_Button.setOnClickListener(new View.OnClickListener(){      
+        	public void onClick(View v) {
+            	if (item_count > 0){ // if not at end
+            		item_count--; // move pointer back one and 
+            		// update the image thumbnails :D
+            		updateThumbs();
+            	}
+            }
+          });
+        
+        // save button onclick
+        // opens the save manager
+        save_Button.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				
+				saveManager();		
+			}
+		});
+        
+        // go button onclick
+        // plays back the story
+        go_Button.setOnClickListener(new View.OnClickListener(){      
+        	public void onClick(View v) {
+            	playShow();    	      
+            }
+        });
+        
+        // inital setup
+        prev_Button.setEnabled(false); //cant go back yet
+        
+        if (ITEM_SIZE <= 1){ //if no item to the right then 
+        	next_Button.setEnabled(false);
         }
         
-        // check the size of the imported array
-        ITEM_SIZE = items.length;
         
-        // Deletion Popup Options
+        
+        
+	}
+
+
+	/**
+     * does the setup for the popup buttons
+     * @author Rambo
+     * 
+     */
+    private void popSetup(){
+
+    	
+    	 // Deletion Popup Options
     	ActionItem yesItem 	= new ActionItem(ID_YES, getResources().getDrawable(R.drawable.ok_app));
     	ActionItem noItem 	= new ActionItem(ID_NO, getResources().getDrawable(R.drawable.back_app));
     	
@@ -310,119 +425,101 @@ public class Image_Story extends Activity {
             	sftAction.show(v);       	      
             }
           });
-        
-        
-        
-        
-
-         
-        // find the buttons
-        try{
-        
-        next_Button = (ImageButton)findViewById(R.id.next);
-        prev_Button = (ImageButton)findViewById(R.id.prev);
-       
-        save_Button = (ImageButton)findViewById(R.id.save);
-        new_Button = (ImageButton)findViewById(R.id.newSlide);
-        
-        go_Button = (ImageButton)findViewById(R.id.playStory);
-        
-        
-        
-        rightThumbArr[0] = (ImageView)findViewById(R.id.rightImg1);
-        rightThumbArr[1] = (ImageView)findViewById(R.id.rightImg2);
-        rightThumbArr[2] = (ImageView)findViewById(R.id.rightImg3);
-        rightThumbArr[3] = (ImageView)findViewById(R.id.rightImg4);
-        leftThumbArr[0] = (ImageView)findViewById(R.id.leftImg1);
-        leftThumbArr[1] = (ImageView)findViewById(R.id.leftImg2);
-        leftThumbArr[2] = (ImageView)findViewById(R.id.leftImg3);
-        leftThumbArr[3] = (ImageView)findViewById(R.id.leftImg4);
-        } catch(Exception ex){
-        	Log.e(TAG, ":/");
-        }
-        
-        
-        
-        // inital setup
-        prev_Button.setEnabled(false); //cant go back yet
-        
-
-        if (items[item_count] == null){
-        	items[item_count] = new AudioImg();
-        }
-        
-        updateThumbs();
-        
-        // New button onclick
-        new_Button.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-            	InsertNewSlide();
-            }
-          });
-        
-        // Next button onclick
-        next_Button.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-         
-                // if not at the end of the array
-            	if (item_count < ITEM_SIZE-1){
-            		
-            		item_count++;
-        
-            		// Update thumbnails 
-            		updateThumbs();
-	
-            		
-            	} 
-            }
-          });
-        
-        // prev button onclick
-        prev_Button.setOnClickListener(new View.OnClickListener(){      
-        	public void onClick(View v) {
-            	if (item_count > 0){
-            		item_count--;
-
-            		// update the image thumbnails :D
-            		updateThumbs();
-
-            	}
-            		
-        	      
-            }
-          });
-        
-        // save button onclick
-        save_Button.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				saveStory();			
-				
-				Toast.makeText(getApplicationContext(), " Saved!", Toast.LENGTH_SHORT).show();
-			}
-		});
-        
-        // go button onclick
-        go_Button.setOnClickListener(new View.OnClickListener(){      
-        	public void onClick(View v) {
-            	playShow();    	      
-            }
-        });
-        
-        
-        
-        
-        
-        
-       
     }
     
     /**
+     * starts a new activity to deal with teh save stuff...
+     * @author Rambo
+     */
+    private void saveManager(){
+    	Intent intent = new Intent(this, SaveMenu.class);
+    	startActivity(intent);
+    	
+    }
+    
+    /**
+     * tries to recover an old save
+     * @return returns true if object recovered from save
+     * @author Rambo
+     */
+    private boolean getSave(){
+    	// try recover save?
+        try{
+	        FileInputStream inStream = openFileInput("save_file.dat");
+	        ObjectInputStream objectInStream = new ObjectInputStream(inStream);
+	        int count = objectInStream.readInt(); // Get the number of objects
+	        
+	        for (int c=0; c < count; c++)
+	            items[c] = (AudioImg) objectInStream.readObject();
+	        objectInStream.close();
+	        
+	        
+	        
+	        Toast toast = Toast.makeText(getApplicationContext(), "Save Restored!", Toast.LENGTH_SHORT);
+	        toast.show();
+	        
+	        return true; // found save
+	        
+        } catch (Exception ex){ // something went wrong... 
+        	
+        	// report the error
+        	Log.e(TAG, "save open error :(");
+        	Log.e(TAG, ex.toString());
+        	for (String s : fileList()){
+        		Log.e(TAG, s);
+        	}
+        	
+        	return false; // no save restored
+        }
+    }
+    
+    /**
+     * saves the current story layout to a file
+     * @author Rambo
+     */
+    private void saveStory(){
+    	String FILENAME = "save_file.dat";
+		try{
+			FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+			
+			
+			ObjectOutputStream objectOutStream = new ObjectOutputStream(fos);
+			objectOutStream.writeInt(items.length); // Save size first
+			for(AudioImg a :items)
+			    objectOutStream.writeObject(a);
+			objectOutStream.close();
+			fos.close();
+			Log.d(TAG, "File Saved!");
+			
+			// let the user know...
+			Toast.makeText(getApplicationContext(), " Saved!", Toast.LENGTH_SHORT).show();
+			
+		} catch(Exception ex){
+			Log.e(TAG, "Save error... :(");
+		}
+    }
+    
+    /**
+     * initializes a new story
+     * @author Rambo
+     */
+    private void newStory(){
+    	// init the counters
+    	item_count = 0;
+    	ITEM_SIZE = 1; 
+    	items[item_count] = new AudioImg(); // create a new object at the first position of the array
+    	
+    }
+    
+    
+    /**
      * Little function to update all the thumbnail previews
+     * @author Rambo
      */
     private void updateThumbs(){
     	try{
 	    	// check if the main image exists
-	    	if(items[item_count].getBitmapPath() != null){
+	    	if(items[item_count].fetchImg() != null){
 				mainImage.setImageBitmap(items[item_count].fetchImg()); // update the view
 				
 			} else{
@@ -511,28 +608,6 @@ public class Image_Story extends Activity {
     	
     }
     
-    /**
-     * saves the current story layout to a file
-     * @author Rambo
-     */
-    private void saveStory(){
-    	String FILENAME = "save_file.dat";
-		try{
-			FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-			
-			
-			ObjectOutputStream objectOutStream = new ObjectOutputStream(fos);
-			objectOutStream.writeInt(items.length); // Save size first
-			for(AudioImg a :items)
-			    objectOutStream.writeObject(a);
-			objectOutStream.close();
-			fos.close();
-			Log.d(TAG, "File Saved!");
-			
-		} catch(Exception ex){
-			Log.e(TAG, "Save error... :(");
-		}
-    }
     
     protected void startRecording() throws IOException 
     {
